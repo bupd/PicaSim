@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+set -eu
+
+script_path=$(readlink -f "$0")
+root=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
+
+binary="$root/build/linux-x64/Release/PicaSim"
+if [ ! -x "$binary" ]; then
+  binary="$root/build/linux-x64/Debug/PicaSim"
+fi
+
+if [ ! -x "$binary" ]; then
+  printf '%s\n' "PicaSim is not built. Run ./install-arch.sh first." >&2
+  exit 1
+fi
+
+cd "$root/data"
+exec "$binary" "$@"

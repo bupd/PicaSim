@@ -1,5 +1,19 @@
 # PicaSim
 
+## Arch Linux
+
+Install:
+
+```bash
+./install-arch.sh
+```
+
+Run:
+
+```bash
+picasim
+```
+
 This contains the complete source, including (custom) dependencies, for PicaSim flight simulator: https://rowlhouse.co.uk/PicaSim/ 
 
 It also contains tools and build infrastructure for Windows, macOS, Android and iOS.
@@ -413,4 +427,3 @@ Under third_party (git submodules)
 - GLM: MIT licence
 - imgui: MIT licence
 - stb: MIT/public domain
-
