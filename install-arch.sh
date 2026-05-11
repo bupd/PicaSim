@@ -2,21 +2,24 @@
 set -eu
 
 root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-vcpkg_root=${VCPKG_ROOT:-$HOME/.local/share/picasim/vcpkg}
+
+case "$(uname -m)" in
+  x86_64) preset=linux-x64 ;;
+  aarch64|arm64) preset=linux-arm64 ;;
+  *) printf '%s\n' "Unsupported architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+
+if command -v pacman >/dev/null 2>&1; then
+  sudo pacman -S --needed --noconfirm \
+    base-devel git cmake ninja mesa libx11 libxext libxrandr libxcursor \
+    libxi libxfixes libxss libxkbcommon alsa-lib libpulse dbus wayland \
+    pipewire rsync
+fi
 
 git -C "$root" submodule update --init --recursive
 
-if [ ! -x "$vcpkg_root/vcpkg" ]; then
-  mkdir -p "$(dirname -- "$vcpkg_root")"
-  git clone https://github.com/microsoft/vcpkg.git "$vcpkg_root"
-  "$vcpkg_root/bootstrap-vcpkg.sh"
-fi
-
-VCPKG_ROOT="$vcpkg_root" cmake --preset linux-x64 \
-  -DSDL_PIPEWIRE=OFF \
-  -DPICASIM_ENABLE_VR=OFF \
-  -DCMAKE_CXX_FLAGS="-DGL_GLEXT_PROTOTYPES"
-VCPKG_ROOT="$vcpkg_root" cmake --build --preset linux-x64-release
+cmake --preset "$preset"
+cmake --build --preset "$preset-release"
 
 if [ -w /usr/local/bin ]; then
   ln -sf "$root/picasim" /usr/local/bin/picasim

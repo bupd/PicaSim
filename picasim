@@ -4,12 +4,19 @@ set -eu
 script_path=$(readlink -f "$0")
 root=$(CDPATH= cd -- "$(dirname -- "$script_path")" && pwd)
 
-binary="$root/build/linux-x64/Release/PicaSim"
-if [ ! -x "$binary" ]; then
-  binary="$root/build/linux-x64/Debug/PicaSim"
-fi
+binary=
+for candidate in \
+  "$root/build/linux-x64/Release/PicaSim" \
+  "$root/build/linux-arm64/Release/PicaSim" \
+  "$root/build/linux-x64/Debug/PicaSim" \
+  "$root/build/linux-arm64/Debug/PicaSim"; do
+  if [ -x "$candidate" ]; then
+    binary=$candidate
+    break
+  fi
+done
 
-if [ ! -x "$binary" ]; then
+if [ -z "$binary" ]; then
   printf '%s\n' "PicaSim is not built. Run ./install-arch.sh first." >&2
   exit 1
 fi
